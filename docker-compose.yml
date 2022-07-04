@@ -1,0 +1,34 @@
+version: '3'
+services:
+  prom_prox:
+    image: pambrose/prometheus-proxy:1.13.0
+    restart: always
+    environment:
+      ADMIN_ENABLED: 'true'
+      METRICS_ENABLED: 'true'
+    ports:
+      - "8082:8082"
+      - "8092:8092"
+      - "50051:50051"
+      - "8080:8080"
+    networks:
+       prom_prox:
+          ipv4_address: 172.20.0.7
+
+  prom_agent:
+    image: pambrose/prometheus-agent:1.13.0
+    restart: always
+    environment:
+      AGENT_CONFIG: https://docs.grid.tf/threefold_public/public/raw/branch/master/monitoring/agent.conf
+    ports:
+      - "8093:8093"
+      - "8083:8083"
+    networks:
+       prom_prox :
+          ipv4_address: 172.20.0.6
+networks:
+  prom_prox:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/24
